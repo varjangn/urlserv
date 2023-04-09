@@ -77,11 +77,6 @@ func validatePassword(password string) error {
 }
 
 func (s *APIServer) Register(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	regReq := new(regReqType)
 	if err := json.NewDecoder(r.Body).Decode(regReq); err != nil {
 		log.Println("RegisterError:", err.Error())
@@ -144,11 +139,6 @@ func (s *APIServer) Register(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *APIServer) Login(w http.ResponseWriter, r *http.Request) {
-	if r.Method != "POST" {
-		w.WriteHeader(http.StatusMethodNotAllowed)
-		return
-	}
-
 	loginReq := new(loginReqType)
 	if err := json.NewDecoder(r.Body).Decode(loginReq); err != nil {
 		log.Println("LoginError:", err.Error())

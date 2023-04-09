@@ -26,13 +26,24 @@ func (s *APIServer) Run() error {
 
 	router.Use(LoggingMiddleware)
 
-	router.HandleFunc(v1Prefix, func(w http.ResponseWriter, r *http.Request) {
-		WriteJSON(w, http.StatusOK, map[string]string{"msg": "API is running"})
-	})
+	router.HandleFunc(v1Prefix,
+		Method(func(w http.ResponseWriter, r *http.Request) {
+			WriteJSON(w, http.StatusOK, map[string]string{
+				"status": "API is running",
+				"v":      "v1"})
+		}, "GET"))
 
-	router.HandleFunc(v1Prefix+"register/", s.Register)
-	router.HandleFunc(v1Prefix+"login/", s.Login)
-	router.HandleFunc(v1Prefix+"profile/", JWTAuth(s.Profile, s.store))
+	router.HandleFunc(v1Prefix+"users/register/",
+		Method(s.Register, "POST"))
+
+	router.HandleFunc(v1Prefix+"users/login/",
+		Method(s.Login, "POST"))
+
+	router.HandleFunc(v1Prefix+"users/profile/",
+		Method(JWTAuth(s.Profile, s.store), "GET"))
+
+	router.HandleFunc(v1Prefix+"users/shortner/",
+		Method(JWTAuth(s.Shortner, s.store), "POST"))
 
 	log.Println("APIServer running on", s.listenAddr)
 	return http.ListenAndServe(s.listenAddr, router)

@@ -67,3 +67,15 @@ func JWTAuth(next http.HandlerFunc, s storage.Storage) http.HandlerFunc {
 		next(w, r.WithContext(ctx))
 	})
 }
+
+func Method(next http.HandlerFunc, methods ...string) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		for _, m := range methods {
+			if m == r.Method {
+				next(w, r)
+				return
+			}
+		}
+		w.WriteHeader(http.StatusMethodNotAllowed)
+	}
+}
