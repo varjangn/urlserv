@@ -65,3 +65,15 @@ func (s *APIServer) Shortner(w http.ResponseWriter, r *http.Request) {
 	}
 	WriteJSON(w, http.StatusCreated, url)
 }
+
+func (s *APIServer) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
+	reqUser := r.Context().Value(authUserKey).(*types.User)
+	urls, err := s.store.GetURLs(reqUser)
+	if err != nil {
+		log.Println("ShortnerError:", err.Error())
+		WriteJSON(w, http.StatusInternalServerError,
+			Map{"error": "unknown error"})
+		return
+	}
+	WriteJSON(w, http.StatusOK, urls)
+}

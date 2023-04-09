@@ -13,4 +13,5 @@ type Storage interface {
 	CreateURL(url *types.URL) error
 	GetLongURL(shortId string) (string, error)
 	GetURLbyLongURL(longURL string) (*types.URL, error)
+	GetURLs(u *types.User) ([]*types.URL, error)
 }

@@ -152,3 +152,23 @@ func (s *SqliteStore) GetURLbyLongURL(longURL string) (*types.URL, error) {
 		return nil, err
 	}
 }
+
+func (s *SqliteStore) GetURLs(u *types.User) ([]*types.URL, error) {
+	qry := fmt.Sprintf("SELECT * FROM urls WHERE user_id=%d", u.Id)
+	rows, err := s.db.Query(qry)
+	if err != nil {
+		return nil, err
+	}
+	urls := []*types.URL{}
+	for rows.Next() {
+		url := new(types.URL)
+		err = rows.Scan(
+			&url.Id, &url.UserId, &url.ShortId, &url.Long,
+			&url.CreatedAt)
+		if err != nil {
+			return nil, err
+		}
+		urls = append(urls, url)
+	}
+	return urls, nil
+}

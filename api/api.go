@@ -45,6 +45,9 @@ func (s *APIServer) Run() error {
 	router.HandleFunc(v1Prefix+"users/shortner/",
 		Method(JWTAuth(s.Shortner, s.store), "POST"))
 
+	router.HandleFunc(v1Prefix+"users/urls/",
+		Method(JWTAuth(s.GetUsersURLs, s.store), "GET"))
+
 	log.Println("APIServer running on", s.listenAddr)
 	return http.ListenAndServe(s.listenAddr, router)
 }
