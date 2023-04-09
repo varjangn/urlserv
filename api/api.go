@@ -21,18 +21,18 @@ func NewAPIServer(listenAddr string, store storage.Storage) *APIServer {
 }
 
 func (s *APIServer) Run() error {
+	v1Prefix := "/api/v1/"
 	router := mux.NewRouter()
 
 	router.Use(LoggingMiddleware)
 
-	router.HandleFunc("/api/v1/", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc(v1Prefix, func(w http.ResponseWriter, r *http.Request) {
 		WriteJSON(w, http.StatusOK, map[string]string{"msg": "API is running"})
 	})
 
-	router.HandleFunc("/api/v1/register/", s.Register)
-	router.HandleFunc("/api/v1/login/", s.Login)
-
-	router.HandleFunc("/api/v1/profile/", JWTAuth(s.Profile, s.store))
+	router.HandleFunc(v1Prefix+"register/", s.Register)
+	router.HandleFunc(v1Prefix+"login/", s.Login)
+	router.HandleFunc(v1Prefix+"profile/", JWTAuth(s.Profile, s.store))
 
 	log.Println("APIServer running on", s.listenAddr)
 	return http.ListenAndServe(s.listenAddr, router)
