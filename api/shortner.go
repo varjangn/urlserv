@@ -5,6 +5,7 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/gorilla/mux"
 	gonanoid "github.com/matoous/go-nanoid/v2"
 	"github.com/varjangn/urlserv/types"
 )
@@ -76,4 +77,16 @@ func (s *APIServer) GetUsersURLs(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	WriteJSON(w, http.StatusOK, urls)
+}
+
+func (s *APIServer) Redirect(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	shortId := vars["id"]
+	longUrl, err := s.store.GetLongURL(shortId)
+	if err != nil || longUrl == "" {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	log.Println("Redirect:", longUrl)
+	http.Redirect(w, r, longUrl, http.StatusSeeOther)
 }

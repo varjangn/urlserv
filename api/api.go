@@ -3,6 +3,7 @@ package api
 import (
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/gorilla/mux"
 	"github.com/varjangn/urlserv/storage"
@@ -22,32 +23,35 @@ func NewAPIServer(listenAddr string, store storage.Storage) *APIServer {
 
 func (s *APIServer) Run() error {
 	v1Prefix := "/api/v1/"
-	router := mux.NewRouter()
+	r := mux.NewRouter()
 
-	router.Use(LoggingMiddleware)
+	r.Use(LoggingMiddleware)
 
-	router.HandleFunc(v1Prefix,
+	r.HandleFunc(v1Prefix,
 		Method(func(w http.ResponseWriter, r *http.Request) {
 			WriteJSON(w, http.StatusOK, map[string]string{
 				"status": "API is running",
 				"v":      "v1"})
 		}, "GET"))
 
-	router.HandleFunc(v1Prefix+"users/register/",
+	r.HandleFunc(v1Prefix+"users/register/",
 		Method(s.Register, "POST"))
 
-	router.HandleFunc(v1Prefix+"users/login/",
+	r.HandleFunc(v1Prefix+"users/login/",
 		Method(s.Login, "POST"))
 
-	router.HandleFunc(v1Prefix+"users/profile/",
+	r.HandleFunc(v1Prefix+"users/profile/",
 		Method(JWTAuth(s.Profile, s.store), "GET"))
 
-	router.HandleFunc(v1Prefix+"users/shortner/",
+	r.HandleFunc(v1Prefix+"users/shortner/",
 		Method(JWTAuth(s.Shortner, s.store), "POST"))
 
-	router.HandleFunc(v1Prefix+"users/urls/",
+	r.HandleFunc(v1Prefix+"users/urls/",
 		Method(JWTAuth(s.GetUsersURLs, s.store), "GET"))
 
+	r.HandleFunc("/{id:["+regexp.QuoteMeta(`A-Za-z0-9_-`)+"]{7}}",
+		Method(s.Redirect, "GET"))
+
 	log.Println("APIServer running on", s.listenAddr)
-	return http.ListenAndServe(s.listenAddr, router)
+	return http.ListenAndServe(s.listenAddr, r)
 }
