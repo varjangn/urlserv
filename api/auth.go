@@ -200,6 +200,6 @@ func (s *APIServer) Login(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s *APIServer) Profile(w http.ResponseWriter, r *http.Request) {
-	reqUser := r.Context().Value(Contextkey("user")).(*types.User)
+	reqUser := r.Context().Value(authUserKey).(*types.User)
 	WriteJSON(w, http.StatusOK, reqUser)
 }

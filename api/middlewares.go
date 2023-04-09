@@ -12,7 +12,9 @@ import (
 	"github.com/varjangn/urlserv/storage"
 )
 
-type Contextkey string
+type Contextkey int
+
+const authUserKey Contextkey = 1
 
 func LoggingMiddleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -61,8 +63,7 @@ func JWTAuth(next http.HandlerFunc, s storage.Storage) http.HandlerFunc {
 				Map{"error": "invalid token"})
 			return
 		}
-		key := Contextkey("user")
-		ctx := context.WithValue(r.Context(), key, user)
+		ctx := context.WithValue(r.Context(), authUserKey, user)
 		next(w, r.WithContext(ctx))
 	})
 }
