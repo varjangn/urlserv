@@ -172,3 +172,44 @@ func (s *SqliteStore) GetURLs(u *types.User) ([]*types.URL, error) {
 	}
 	return urls, nil
 }
+
+func (s *SqliteStore) GetURL(id int64, userId int64) (*types.URL, error) {
+	qry := fmt.Sprintf("SELECT * FROM urls WHERE id=%d AND user_id=%d", id, userId)
+	row := s.db.QueryRow(qry)
+	url := new(types.URL)
+
+	switch err := row.Scan(&url.Id, &url.UserId, &url.ShortId, &url.Long,
+		&url.CreatedAt); err {
+	case sql.ErrNoRows:
+		return nil, nil
+	case nil:
+		return url, nil
+	default:
+		return url, err
+	}
+}
+
+func (s *SqliteStore) DeleteURL(id int64, userId int64) (bool, error) {
+	qry := fmt.Sprintf("DELETE FROM urls WHERE id=%d and user_id=%d", id, userId)
+	_, err := s.db.Exec(qry)
+	if err != nil {
+		return false, err
+	}
+	return true, nil
+}
+
+func (s *SqliteStore) UpdateLongURL(id int64, userId int64, longURL string) (bool, error) {
+	qry := `
+	UPDATE urls
+	SET long=$1
+	WHERE id=$2 AND user_id=$3`
+	res, err := s.db.Exec(qry, longURL, id, userId)
+	if err != nil {
+		return false, err
+	}
+	count, err := res.RowsAffected()
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}

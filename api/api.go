@@ -49,6 +49,9 @@ func (s *APIServer) Run() error {
 	r.HandleFunc(v1Prefix+"users/urls/",
 		Method(JWTAuth(s.GetUsersURLs, s.store), "GET"))
 
+	r.HandleFunc(v1Prefix+"users/urls/{id}/",
+		Method(JWTAuth(s.HandleAURL, s.store), "GET", "DELETE", "PUT", "PATCH"))
+
 	r.HandleFunc("/{id:["+regexp.QuoteMeta(`A-Za-z0-9_-`)+"]{7}}",
 		Method(s.Redirect, "GET"))
 

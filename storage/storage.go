@@ -14,4 +14,7 @@ type Storage interface {
 	GetLongURL(shortId string) (string, error)
 	GetURLbyLongURL(longURL string) (*types.URL, error)
 	GetURLs(u *types.User) ([]*types.URL, error)
+	GetURL(id int64, userId int64) (*types.URL, error)
+	DeleteURL(id int64, userId int64) (bool, error)
+	UpdateLongURL(id int64, userId int64, LongURL string) (bool, error)
 }

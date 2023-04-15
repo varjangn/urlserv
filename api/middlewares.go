@@ -40,7 +40,7 @@ func JWTAuth(next http.HandlerFunc, s storage.Storage) http.HandlerFunc {
 			return []byte(os.Getenv("JWT_SECRET")), nil
 		})
 		if err != nil {
-			WriteJSON(w, http.StatusInternalServerError,
+			WriteJSON(w, http.StatusBadRequest,
 				Map{"error": err.Error()})
 			return
 		}
